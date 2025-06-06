@@ -8,7 +8,7 @@ on:
     # Allow manual triggering for testing
 
 permissions:
-  contents: read  # No longer need write permissions for git
+  contents: write  # Need write permissions for GitHub Pages updates
   issues: write
 
 jobs:
@@ -135,6 +135,26 @@ jobs:
       with:
         path: results/current-scan.json
         key: backend-scan-${{ github.run_id }}-${{ github.run_number }}
+    
+    - name: Update GitHub Pages data
+      run: |
+        # Create docs directory if it doesn't exist
+        mkdir -p docs
+        
+        # Copy current scan to docs folder for GitHub Pages
+        cp results/current-scan.json docs/current-scan.json
+        
+        # Add and commit the updated JSON
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/current-scan.json
+        
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update GitHub Pages data - $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          git push
+        fi
     
     - name: Upload current scan as artifact
       uses: actions/upload-artifact@v4
