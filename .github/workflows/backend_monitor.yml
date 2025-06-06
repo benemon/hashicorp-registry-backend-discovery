@@ -43,11 +43,10 @@ jobs:
     
     - name: Run backend discovery
       run: |
-        python3 provenance_discovery.py --output json > results/current-scan.json
+        python3 provenance_discovery.py --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD --output json > results/current-scan.json
       env:
-        # Add any authentication if needed
-        # REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-        # REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+        REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
     
     - name: Compare with previous results
       id: compare
