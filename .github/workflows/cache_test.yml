@@ -1,0 +1,37 @@
+name: Cache Test
+on: workflow_dispatch
+
+jobs:
+  test-cache:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create test file
+      run: |
+        mkdir -p test-results
+        echo "Test data $(date)" > test-results/test.json
+        
+    - name: Save cache
+      uses: actions/cache/save@v4
+      with:
+        path: test-results/test.json
+        key: test-cache-${{ github.run_id }}
+        
+    - name: Remove file
+      run: rm -f test-results/test.json
+      
+    - name: Restore cache
+      uses: actions/cache/restore@v4
+      with:
+        path: test-results/test.json
+        key: test-cache-never-matches
+        restore-keys: |
+          test-cache-
+          
+    - name: Check restored file
+      run: |
+        if [ -f test-results/test.json ]; then
+          echo "SUCCESS: File restored"
+          cat test-results/test.json
+        else
+          echo "FAIL: File not restored"
+        fi
