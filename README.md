@@ -33,7 +33,7 @@ This tool monitors the backend infrastructure of HashiCorp's container registry 
 
 ## 📊 Live Dashboard
 
-View the latest discovery results at: **[GitHub Pages Site](https://[your-username].github.io/hashicorp-registry-backend-discovery/)**
+View the latest discovery results at: **[GitHub Pages Site](https://benemon.github.io/hashicorp-registry-backend-discovery/)**
 
 The dashboard displays:
 - Repository and registry information
