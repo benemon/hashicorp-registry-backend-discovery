@@ -39,7 +39,7 @@ jobs:
         path: results/previous-scan.json  # Different filename
         key: backend-scan-never-matches
         restore-keys: |
-          backend-scan-previous
+          backend-scan-
 
     - name: Prepare previous scan data (if exists)
       run: |
