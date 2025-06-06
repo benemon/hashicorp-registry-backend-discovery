@@ -36,15 +36,16 @@ jobs:
       id: cache-restore
       uses: actions/cache/restore@v4
       with:
-        path: results/previous-scan.json  # Different filename
+        path: results/current-scan.json  # Same path as save
         key: backend-scan-never-matches
         restore-keys: |
           backend-scan-
 
     - name: Prepare previous scan data (if exists)
       run: |
-        if [ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ] && [ -f results/previous-scan.json ]; then
-          echo "Found previous scan results, prepared for comparison"
+        if [ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ] && [ -f results/current-scan.json ]; then
+          mv results/current-scan.json results/previous-scan.json
+          echo "Found previous scan results, moved to previous-scan.json for comparison"
         else
           echo "No previous scan results found - this will be a first run"
         fi
