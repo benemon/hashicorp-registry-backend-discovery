@@ -40,19 +40,19 @@ jobs:
         key: backend-scan-previous
         restore-keys: |
           backend-scan-previous
-    
-    - name: Copy restored cache for comparison (if exists)
+
+    - name: Prepare previous scan data (if exists)
       run: |
         if [ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ] && [ -f results/current-scan.json ]; then
-          cp results/current-scan.json results/current-scan.json.backup
-          echo "Found previous scan results, backed up for comparison"
+          mv results/current-scan.json results/current-scan.json.backup
+          echo "Found previous scan results, prepared for comparison"
         else
-          echo "No previous scan results found"
+          echo "No previous scan results found - this will be a first run"
         fi
         
     - name: Run backend discovery
       run: |
-        python3 registry_backend_discovery.py --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD --output json > results/current-scan.json
+          python3 registry_backend_discovery.py --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD --output json > results/current-scan.json
       env:
         REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
         REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}

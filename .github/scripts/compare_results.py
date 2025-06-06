@@ -175,26 +175,7 @@ def main():
     current_file = "results/current-scan.json"
     previous_file = "results/current-scan.json.backup"
     
-    # Check if the current_file exists and has valid content before backing it up
-    if os.path.exists(current_file):
-        try:
-            with open(current_file, 'r') as f:
-                content = f.read().strip()
-            
-            # Only backup if file has content and is valid JSON
-            if content and is_json(content):
-                with open(current_file, 'r') as src, open(previous_file, 'w') as dest:
-                    dest.write(content)
-                print(f"INFO: Successfully copied restored cache to {previous_file}")
-            else:
-                print(f"INFO: Restored cache file exists but is empty or invalid, skipping backup")
-                # Remove the backup file if it exists to avoid comparing with invalid data
-                if os.path.exists(previous_file):
-                    os.remove(previous_file)
-        except Exception as e:
-            print(f"WARNING: Failed to backup restored cache: {e}")
-    
-    # Load current results
+    # Load current results (should exist from the discovery script)
     current_data = load_json_file(current_file)
     if not current_data:
         print(f"ERROR: Could not load current results from {current_file}")
@@ -209,9 +190,9 @@ def main():
         # Set output for GitHub Actions
         with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
             f.write(f"changes_detected=false\n")
-            f.write(f"first_run=true\n")  # Add a new output parameter
+            f.write(f"first_run=true\n")
         
-        # Still generate a report for the first run
+        # Generate a report for the first run
         report = generate_comparison_report(current_data, None, ["This is the first run - establishing baseline"])
         os.makedirs("results", exist_ok=True)
         with open("results/comparison-report.md", "w") as f:
@@ -247,10 +228,12 @@ def main():
         # Set output for GitHub Actions
         with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
             f.write(f"changes_detected=true\n")
+            f.write(f"first_run=false\n")
     else:
         print("INFO: No significant changes detected")
         with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
             f.write(f"changes_detected=false\n")
+            f.write(f"first_run=false\n")
     
     print(f"\nComparison completed successfully")
 
