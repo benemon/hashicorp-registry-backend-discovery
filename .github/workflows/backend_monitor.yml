@@ -36,11 +36,20 @@ jobs:
       id: cache-restore
       uses: actions/cache/restore@v4
       with:
-        path: results/previous-scan.json
-        key: backend-scan-never-match  # Force restore from restore-keys
+        path: results/current-scan.json
+        key: backend-scan-previous
         restore-keys: |
           backend-scan-previous
     
+    - name: Copy restored cache for comparison (if exists)
+      run: |
+        if [ -f results/current-scan.json ]; then
+          cp results/current-scan.json results/current-scan.json.backup
+          echo "Found previous scan results, backed up for comparison"
+        else
+          echo "No previous scan results found"
+        fi
+        
     - name: Run backend discovery
       run: |
         python3 registry_backend_discovery.py --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD --output json > results/current-scan.json
@@ -107,7 +116,7 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: results/current-scan.json
-        key: backend-scan-previous-${{ github.run_number }}
+        key: backend-scan-previous
     
     - name: Upload current scan as artifact (optional)
       uses: actions/upload-artifact@v4

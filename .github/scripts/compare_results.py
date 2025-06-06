@@ -137,7 +137,16 @@ def main():
     
     # File paths for current and previous scans
     current_file = "results/current-scan.json"
-    previous_file = "results/previous-scan.json"
+    previous_file = "results/current-scan.json.backup"
+    
+    # Copy the restored cache to a backup before generating new results
+    if os.path.exists(current_file):
+        try:
+            with open(current_file, 'r') as src, open(previous_file, 'w') as dest:
+                dest.write(src.read())
+            print(f"INFO: Successfully copied restored cache to {previous_file}")
+        except Exception as e:
+            print(f"WARNING: Failed to backup restored cache: {e}")
     
     # Load current results
     current_data = load_json_file(current_file)
@@ -150,7 +159,8 @@ def main():
     if not previous_data:
         print("INFO: No previous scan results found (first run)")
         # Set output for GitHub Actions
-        print("::set-output name=changes_detected::false")
+        with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
+            f.write(f"changes_detected=false\n")
         
         # Still generate a report for the first run
         report = generate_comparison_report(current_data, None, [])
@@ -186,10 +196,12 @@ def main():
         print(f"\nDetailed report saved to: results/comparison-report.md")
         
         # Set output for GitHub Actions
-        print("::set-output name=changes_detected::true")
+        with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
+            f.write(f"changes_detected=true\n")
     else:
         print("INFO: No significant changes detected")
-        print("::set-output name=changes_detected::false")
+        with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
+            f.write(f"changes_detected=false\n")
     
     print(f"\nComparison completed successfully")
 
