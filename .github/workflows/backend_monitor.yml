@@ -43,7 +43,7 @@ jobs:
     
     - name: Run backend discovery
       run: |
-        python3 provenance_discovery.py --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD --output json > results/current-scan.json
+        python3 registry_backend_discovery.py --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD --output json > results/current-scan.json
       env:
         REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
         REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
@@ -51,7 +51,7 @@ jobs:
     - name: Compare with previous results
       id: compare
       run: |
-        python3 .github/scripts/compare_cached_results.py
+        python3 .github/scripts/compare_results.py
       continue-on-error: true
     
     - name: Create alert issue on changes
