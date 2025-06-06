@@ -424,10 +424,6 @@
                         <div class="label">Platforms</div>
                         <div class="value">${platforms.length}</div>
                     </div>
-                    <div class="info-item">
-                        <div class="label">Layers</div>
-                        <div class="value">${tagData.layers ? tagData.layers.length : 0}</div>
-                    </div>
                 </div>
 
                 ${platforms.length > 0 ? `
@@ -435,7 +431,7 @@
                         <div class="section-title">Platforms</div>
                         ${platforms.map(platform => `
                             <div class="platform-item">
-                                ${platform.platform} (${platform.layer_count || 0} layers)
+                                ${platform.platform}
                             </div>
                         `).join('')}
                     </div>
