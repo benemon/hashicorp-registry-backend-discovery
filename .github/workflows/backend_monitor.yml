@@ -32,6 +32,13 @@ jobs:
     - name: Create output directory
       run: mkdir -p results
     
+    - name: Debug - List available caches
+      run: |
+        echo "Listing recent caches:"
+        gh cache list --limit 10 || echo "Failed to list caches"
+      env:
+        GH_TOKEN: ${{ github.token }}
+
     - name: Restore previous scan results
       id: cache-restore
       uses: actions/cache/restore@v4
@@ -41,9 +48,17 @@ jobs:
         restore-keys: |
           backend-scan-
 
+    - name: Debug cache restore results
+      run: |
+        echo "Cache hit: ${{ steps.cache-restore.outputs.cache-hit }}"
+        echo "Cache matched key: ${{ steps.cache-restore.outputs.cache-matched-key }}"
+        echo "Cache primary key: ${{ steps.cache-restore.outputs.cache-primary-key }}"
+        echo "Checking if file exists after restore:"
+        ls -la results/ || echo "Results directory doesn't exist"
+
     - name: Prepare previous scan data (if exists)
       run: |
-        if [ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ] && [ -f results/current-scan.json ]; then
+        if [ -f results/current-scan.json ]; then
           mv results/current-scan.json results/previous-scan.json
           echo "Found previous scan results, moved to previous-scan.json for comparison"
         else
