@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashiCorp Registry Backend Discovery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .meta-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .meta-card h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .meta-card p {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-section h2 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .endpoint-list {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .endpoint {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tags-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+
+        .tag-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .tag-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .tag-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .tag-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tag-digest {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            background: #f8f9fa;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            color: #495057;
+            border: 1px solid #e9ecef;
+        }
+
+        .manifest-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .info-item .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8b4513;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-item .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #d2691e;
+        }
+
+        .platforms-section, .endpoints-section {
+            margin-top: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .platform-item, .endpoint-item {
+            background: #f8f9fa;
+            padding: 0.8rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            border-left: 3px solid #28a745;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .endpoint-item {
+            border-left-color: #17a2b8;
+        }
+
+        .timestamp {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tag-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .manifest-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>HashiCorp Registry Backend Discovery</h1>
+            <p>Real-time monitoring of Terraform Enterprise registry infrastructure</p>
+        </div>
+        
+        <div class="content">
+            <div id="loading" class="loading">
+                Loading latest discovery data...
+            </div>
+            
+            <div id="error" class="error" style="display: none;">
+                Unable to load discovery data. Please check if the JSON file is available.
+            </div>
+            
+            <div id="data-content" style="display: none;">
+                <div class="meta-info">
+                    <div class="meta-card">
+                        <h3>Repository</h3>
+                        <p id="repository">-</p>
+                    </div>
+                    <div class="meta-card">
+                        <h3>Registry</h3>
+                        <p id="registry">-</p>
+                    </div>
+                    <div class="meta-card">
+                        <h3>Last Scan</h3>
+                        <p id="timestamp">-</p>
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h2>Infrastructure Summary</h2>
+                    <div class="manifest-info">
+                        <div class="info-item">
+                            <div class="label">S3 Endpoints</div>
+                            <div class="value" id="endpoint-count">0</div>
+                        </div>
+                    </div>
+                    <div class="endpoint-list" id="endpoint-list">
+                        <!-- Endpoints will be populated here -->
+                    </div>
+                </div>
+
+                <div class="tags-section">
+                    <h2>Container Image Tags</h2>
+                    <div id="tags-container">
+                        <!-- Tags will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadDiscoveryData() {
+            try {
+                // Try to load from the most recent artifact or a static file
+                // You'll need to update this URL to point to your actual JSON file
+                const response = await fetch('./current-scan.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayData(data);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `
+                    <strong>Error:</strong> ${error.message}<br>
+                    <small>Make sure current-scan.json is available in the docs folder.</small>
+                `;
+            }
+        }
+
+        function displayData(data) {
+            // Hide loading, show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('data-content').style.display = 'block';
+
+            // Populate meta information
+            document.getElementById('repository').textContent = data.repository || 'Unknown';
+            document.getElementById('registry').textContent = data.registry || 'Unknown';
+            document.getElementById('timestamp').textContent = data.discovery_timestamp || 'Unknown';
+
+            // Populate summary
+            const summary = data.summary || {};
+            document.getElementById('endpoint-count').textContent = summary.s3_endpoint_count || 0;
+            
+            const endpointList = document.getElementById('endpoint-list');
+            endpointList.innerHTML = '';
+            
+            if (summary.s3_endpoints && summary.s3_endpoints.length > 0) {
+                summary.s3_endpoints.forEach(endpoint => {
+                    const div = document.createElement('div');
+                    div.className = 'endpoint';
+                    div.textContent = endpoint;
+                    endpointList.appendChild(div);
+                });
+            } else {
+                endpointList.innerHTML = '<div class="endpoint">No S3 endpoints found</div>';
+            }
+
+            // Populate tags
+            const tagsContainer = document.getElementById('tags-container');
+            tagsContainer.innerHTML = '';
+
+            if (data.tags && Object.keys(data.tags).length > 0) {
+                Object.entries(data.tags).forEach(([tagName, tagData]) => {
+                    const tagCard = createTagCard(tagName, tagData);
+                    tagsContainer.appendChild(tagCard);
+                });
+            } else {
+                tagsContainer.innerHTML = '<p>No tags found</p>';
+            }
+        }
+
+        function createTagCard(tagName, tagData) {
+            const card = document.createElement('div');
+            card.className = 'tag-card';
+
+            const manifestInfo = tagData.manifest_info || {};
+            const platforms = tagData.platforms || [];
+            const s3Endpoints = tagData.s3_endpoints || [];
+
+            card.innerHTML = `
+                <div class="tag-header">
+                    <div class="tag-name">${tagName}</div>
+                    <div class="tag-digest">${manifestInfo.digest ? manifestInfo.digest.substring(0, 20) + '...' : 'No digest'}</div>
+                </div>
+                
+                <div class="manifest-info">
+                    <div class="info-item">
+                        <div class="label">Manifest Type</div>
+                        <div class="value">${manifestInfo.type ? manifestInfo.type.split('.').pop() : 'Unknown'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Size</div>
+                        <div class="value">${manifestInfo.size || 0} bytes</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Platforms</div>
+                        <div class="value">${platforms.length}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Layers</div>
+                        <div class="value">${tagData.layers ? tagData.layers.length : 0}</div>
+                    </div>
+                </div>
+
+                ${platforms.length > 0 ? `
+                    <div class="platforms-section">
+                        <div class="section-title">Platforms</div>
+                        ${platforms.map(platform => `
+                            <div class="platform-item">
+                                ${platform.platform} (${platform.layer_count || 0} layers)
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                ${s3Endpoints.length > 0 ? `
+                    <div class="endpoints-section">
+                        <div class="section-title">S3 Endpoints</div>
+                        ${s3Endpoints.map(endpoint => `
+                            <div class="endpoint-item">${endpoint}</div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
+
+            return card;
+        }
+
+        // Load data when page loads
+        window.addEventListener('load', loadDiscoveryData);
+    </script>
+</body>
+</html>
