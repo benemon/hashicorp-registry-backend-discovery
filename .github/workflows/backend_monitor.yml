@@ -43,7 +43,7 @@ jobs:
     
     - name: Copy restored cache for comparison (if exists)
       run: |
-        if [ -f results/current-scan.json ]; then
+        if [ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ] && [ -f results/current-scan.json ]; then
           cp results/current-scan.json results/current-scan.json.backup
           echo "Found previous scan results, backed up for comparison"
         else
@@ -62,6 +62,10 @@ jobs:
       run: |
         python3 .github/scripts/compare_results.py
       continue-on-error: true
+      
+    - name: Report first run status
+      if: steps.compare.outputs.first_run == 'true'
+      run: echo "::notice::This is the first run of the backend monitor - baseline established for future comparisons"
     
     - name: Create alert issue on changes
       if: steps.compare.outputs.changes_detected == 'true'

@@ -13,13 +13,44 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 
 def load_json_file(file_path: str) -> Optional[Dict]:
-    """Load and parse a JSON file, returning None if it fails."""
+    """Load and parse a JSON file, returning None if it fails or if file is empty."""
     try:
         with open(file_path, 'r') as f:
-            return json.load(f)
+            content = f.read().strip()
+            if not content:  # Check if file is empty
+                print(f"File {file_path} is empty")
+                return None
+            return json.loads(content)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Error loading {file_path}: {e}")
         return None
+
+def is_valid_scan_data(data: Dict) -> bool:
+    """Check if the loaded JSON data has the expected structure of a scan result."""
+    if not data:
+        return False
+    
+    # Check for required fields in scan data
+    required_fields = ["summary", "discovery_timestamp"]
+    for field in required_fields:
+        if field not in data:
+            print(f"Invalid scan data: missing '{field}' field")
+            return False
+    
+    # Check if summary has expected structure
+    if not isinstance(data.get("summary"), dict):
+        print(f"Invalid scan data: 'summary' is not a dictionary")
+        return False
+    
+    return True
+
+def is_json(text: str) -> bool:
+    """Check if a string is valid JSON."""
+    try:
+        json.loads(text)
+        return True
+    except json.JSONDecodeError:
+        return False
 
 def extract_summary_data(data: Dict) -> Dict:
     """Extract comparable summary data from backend scan results."""
@@ -91,6 +122,9 @@ def generate_comparison_report(current_data: Dict, previous_data: Optional[Dict]
     current_time = current_data.get('discovery_timestamp', 'Unknown')
     previous_time = previous_data.get('discovery_timestamp', 'Unknown') if previous_data else 'No previous scan'
     
+    # Check if this is the first run
+    is_first_run = not previous_data
+    
     report = f"""## Detailed Backend Comparison Report
 
 ### Scan Information
@@ -101,7 +135,9 @@ def generate_comparison_report(current_data: Dict, previous_data: Optional[Dict]
 ### Summary of Changes
 """
     
-    if changes:
+    if is_first_run:
+        report += "- 🚀 First run - establishing baseline for future comparisons\n"
+    elif changes:
         for change in changes:
             report += f"- ⚠️ {change}\n"
     else:
@@ -139,12 +175,22 @@ def main():
     current_file = "results/current-scan.json"
     previous_file = "results/current-scan.json.backup"
     
-    # Copy the restored cache to a backup before generating new results
+    # Check if the current_file exists and has valid content before backing it up
     if os.path.exists(current_file):
         try:
-            with open(current_file, 'r') as src, open(previous_file, 'w') as dest:
-                dest.write(src.read())
-            print(f"INFO: Successfully copied restored cache to {previous_file}")
+            with open(current_file, 'r') as f:
+                content = f.read().strip()
+            
+            # Only backup if file has content and is valid JSON
+            if content and is_json(content):
+                with open(current_file, 'r') as src, open(previous_file, 'w') as dest:
+                    dest.write(content)
+                print(f"INFO: Successfully copied restored cache to {previous_file}")
+            else:
+                print(f"INFO: Restored cache file exists but is empty or invalid, skipping backup")
+                # Remove the backup file if it exists to avoid comparing with invalid data
+                if os.path.exists(previous_file):
+                    os.remove(previous_file)
         except Exception as e:
             print(f"WARNING: Failed to backup restored cache: {e}")
     
@@ -156,14 +202,17 @@ def main():
     
     # Load previous results (may not exist on first run)
     previous_data = load_json_file(previous_file)
-    if not previous_data:
-        print("INFO: No previous scan results found (first run)")
+    is_first_run = not previous_data or not is_valid_scan_data(previous_data)
+
+    if is_first_run:
+        print("INFO: No valid previous scan results found (first run)")
         # Set output for GitHub Actions
         with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
             f.write(f"changes_detected=false\n")
+            f.write(f"first_run=true\n")  # Add a new output parameter
         
         # Still generate a report for the first run
-        report = generate_comparison_report(current_data, None, [])
+        report = generate_comparison_report(current_data, None, ["This is the first run - establishing baseline"])
         os.makedirs("results", exist_ok=True)
         with open("results/comparison-report.md", "w") as f:
             f.write(report)
