@@ -36,15 +36,14 @@ jobs:
       id: cache-restore
       uses: actions/cache/restore@v4
       with:
-        path: results/current-scan.json
-        key: backend-scan-previous
+        path: results/previous-scan.json  # Different filename
+        key: backend-scan-never-matches
         restore-keys: |
           backend-scan-previous
 
     - name: Prepare previous scan data (if exists)
       run: |
-        if [ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ] && [ -f results/current-scan.json ]; then
-          mv results/current-scan.json results/current-scan.json.backup
+        if [ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ] && [ -f results/previous-scan.json ]; then
           echo "Found previous scan results, prepared for comparison"
         else
           echo "No previous scan results found - this will be a first run"
@@ -61,7 +60,6 @@ jobs:
       id: compare
       run: |
         python3 .github/scripts/compare_results.py
-      continue-on-error: true
       
     - name: Report first run status
       if: steps.compare.outputs.first_run == 'true'
@@ -120,11 +118,11 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: results/current-scan.json
-        key: backend-scan-previous
+        key: backend-scan-${{ github.run_id }}-${{ github.run_number }}
     
-    - name: Upload current scan as artifact (optional)
+    - name: Upload current scan as artifact
       uses: actions/upload-artifact@v4
       with:
         name: backend-scan-${{ github.run_number }}
         path: results/current-scan.json
-        retention-days: 7  # Keep for 1 week only
+        retention-days: 7

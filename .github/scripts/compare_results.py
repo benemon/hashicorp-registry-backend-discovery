@@ -173,7 +173,7 @@ def main():
     
     # File paths for current and previous scans
     current_file = "results/current-scan.json"
-    previous_file = "results/current-scan.json.backup"
+    previous_file = "results/previous-scan.json"
     
     # Load current results (should exist from the discovery script)
     current_data = load_json_file(current_file)
