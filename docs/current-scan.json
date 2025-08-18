@@ -1,7 +1,7 @@
 {
   "repository": "hashicorp/terraform-enterprise",
   "registry": "https://images.releases.hashicorp.com",
-  "discovery_timestamp": "2025-08-17 06:28:36 UTC",
+  "discovery_timestamp": "2025-08-18 06:33:15 UTC",
   "tags": {
     "latest": {
       "manifest_info": {
