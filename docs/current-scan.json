@@ -1,87 +1,8 @@
 {
   "repository": "hashicorp/terraform-enterprise",
   "registry": "https://images.releases.hashicorp.com",
-  "discovery_timestamp": "2025-09-30 06:29:07 UTC",
+  "discovery_timestamp": "2025-10-01 06:28:49 UTC",
   "tags": {
-    "latest": {
-      "manifest_info": {
-        "found": true,
-        "type": "application/vnd.docker.distribution.manifest.list.v2+json",
-        "digest": "sha256:919752f98371620e8ace7775de0e055dda9cf1c5d0dbb63d408c7afa63f8ae96",
-        "size": 557
-      },
-      "platforms": [
-        {
-          "platform": "linux/amd64",
-          "manifest_digest": "sha256:edc06293b395e5beb3dfbbda4e89341334ab184c5895b81cf31c074dadc43ff7",
-          "size": 9445,
-          "digest": "sha256:edc06293b395e5beb3dfbbda4e89341334ab184c5895b81cf31c074dadc43ff7",
-          "layer_count": 56
-        },
-        {
-          "platform": "linux/arm64",
-          "manifest_digest": "sha256:7d7dfa2b283f252b8a65b1689a49db2b3a0b81fcaefd11a560a93baf8ad6041f",
-          "size": 9443,
-          "digest": "sha256:7d7dfa2b283f252b8a65b1689a49db2b3a0b81fcaefd11a560a93baf8ad6041f",
-          "layer_count": 56
-        }
-      ],
-      "layers": [
-        {
-          "digest": "sha256:b9f78a673b3de2980094d3c53d3088a7d5fc9e772ddc367c072588b6aa3b707a",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        },
-        {
-          "digest": "sha256:376345e335035fcbd15d4f07cb10eaaee68247d5c80d0e7268ca360ab2ba5ea3",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        },
-        {
-          "digest": "sha256:1b2fab6fd699b4b88add4c711ecdcdeddadce8c207d5c92ca62b089528bae6e8",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        },
-        {
-          "digest": "sha256:fdc765cfbbc20f8958b3ca7e2f77ac9056370951e018127efabb5c7fa09cc182",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        },
-        {
-          "digest": "sha256:de343dbb23268ec6e24db140ee938c5c78c98eeb715796b394e05af77828bb95",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        },
-        {
-          "digest": "sha256:4698f5bc556059ed6b714b9113317b5e4ce8111096b86123e04b840ae3404aa9",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        },
-        {
-          "digest": "sha256:a2a873d91e790660b5374d6f78fa290e09ec2273ae37d9a2799ed23470696013",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        },
-        {
-          "digest": "sha256:242641d83e48c5aa84dee2e30149ee6ff564eb115caf0bc64e82852c4c17006b",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        },
-        {
-          "digest": "sha256:a5d942ab87d7066b9755b330da8e19607e0ee46c5a1a1adb963dea1647a71267",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        },
-        {
-          "digest": "sha256:0ed7a947e214eec0c2e1a2f30927c147cef71b1d84597044e7dcf6f274663466",
-          "platform": "linux/amd64",
-          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-        }
-      ],
-      "s3_endpoints": [
-        "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
-      ]
-    },
     "v202507-1": {
       "manifest_info": {
         "found": true,
@@ -354,6 +275,70 @@
         },
         {
           "digest": "sha256:68fea45d86dcfdc443643a3a0dd690863c9c5f9cf6e605a6bef39a5753387b1c",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        }
+      ],
+      "s3_endpoints": [
+        "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+      ]
+    },
+    "v202503-1": {
+      "manifest_info": {
+        "found": true,
+        "type": "application/vnd.docker.distribution.manifest.v2+json",
+        "digest": "sha256:65b3dee33d08a3124979ec75b02bffe44c8936014316299fd62875df0965229a",
+        "size": 9612
+      },
+      "platforms": [],
+      "layers": [
+        {
+          "digest": "sha256:8f84a9f2102e97a4a6bf673b150fc9894df5acc9618ad3484c6c36f768c1caa0",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        },
+        {
+          "digest": "sha256:1b29fe86295289c6e5fe121a03d4c40fbebdb6c9ddeaf5e41f19d1b7086d39e6",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        },
+        {
+          "digest": "sha256:856576917c8c21133bcd7f80931cb2374eb28010caaefa9d04372448085d4ccb",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        },
+        {
+          "digest": "sha256:0384e987c6a8e52199e0d0cae6e75298d356f8c0581d519397db36708abd3f6d",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        },
+        {
+          "digest": "sha256:90929f732ca7a9f176f33945de4fd93f7bae6795a5a29dd9560f4199a5469abf",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        },
+        {
+          "digest": "sha256:ed2cb2ff105c8e19fcdacb4ef8d8584b0b0ff1d60d663216d53c4815bef61824",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        },
+        {
+          "digest": "sha256:bff07b8a3434f54ce2b5189d1c3557cc02555018746e479292f76a05cf6521a6",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        },
+        {
+          "digest": "sha256:3aa53ee88ee50b7c6e745a2a52379e0800b0c7c638d3f8510f199f1aef90f3df",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        },
+        {
+          "digest": "sha256:90faf5d626031580eef0ce1a54beed8846d0480558a0d9f794975b2fa56a5957",
+          "platform": "single-arch",
+          "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
+        },
+        {
+          "digest": "sha256:f381e54d9212cd44932ca5b9f420824e0bbb2c190c40df8396201aa938676b60",
           "platform": "single-arch",
           "s3_endpoint": "prod-us-east-1-starport-layer-bucket.s3.dualstack.us-east-1.amazonaws.com"
         }
